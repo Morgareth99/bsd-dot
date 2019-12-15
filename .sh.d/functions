@@ -1,0 +1,116 @@
+## Functions 
+
+# Z shell compatible chpwd() hook, used to update DIRSTACK[0]
+DIRSTACKBASE=$(realpath ~/. 2>/dev/null || print -nr -- "${HOME:-/}")
+set -A DIRSTACK
+function chpwd {
+        DIRSTACK[0]=$(realpath . 2>/dev/null || print -r -- "$PWD")
+        [[ $DIRSTACKBASE = ?(*/) ]] || \
+            DIRSTACK[0]=${DIRSTACK[0]/#$DIRSTACKBASE/~}
+        :
+}
+chpwd .
+function cd {
+        builtin cd "$@" || return $?
+        chpwd "$@"
+}
+function cd_csh {
+        local d t=${1/#~/$DIRSTACKBASE}
+
+        if ! d=$(builtin cd "$t" 2>&1); then
+                print -u2 "${1}: ${d##*cd: $t: }."
+                return 1
+        fi
+        cd "$t"
+}
+
+function dirs {
+        local d dwidth
+        local -i fl=0 fv=0 fn=0 cpos=0
+
+        while getopts ":lvn" d; do
+                case $d {
+                (l)     fl=1 ;;
+                (v)     fv=1 ;;
+                (n)     fn=1 ;;
+                (*)     print -u2 'Usage: dirs [-lvn].'
+                        return 1 ;;
+                }
+        done
+        shift $((OPTIND - 1))
+        if (( $# > 0 )); then
+                print -u2 'Usage: dirs [-lvn].'
+                return 1
+        fi
+        if (( fv )); then
+                fv=0
+                while (( fv < ${#DIRSTACK[*]} )); do
+                        d=${DIRSTACK[fv]}
+                        (( fl )) && d=${d/#~/$DIRSTACKBASE}
+                        print -r -- "$fv        $d"
+                        let fv++
+                done
+        else
+                fv=0
+                while (( fv < ${#DIRSTACK[*]} )); do
+                        d=${DIRSTACK[fv]}
+                        (( fl )) && d=${d/#~/$DIRSTACKBASE}
+                        (( dwidth = (${%d} > 0 ? ${%d} : ${#d}) ))
+                        if (( fn && (cpos += dwidth + 1) >= 79 && \
+                            dwidth < 80 )); then
+                                print
+                                (( cpos = dwidth + 1 ))
+                        fi
+                        print -nr -- "$d "
+                        let fv++
+                done
+                print
+        fi
+        return 0
+
+}
+# pager (not control character safe)
+function smores {
+        (
+                set +m
+                cat "$@" |&
+                trap "rv=\$?; kill $! >/dev/null 2>&1; exit \$rv" EXIT
+                while IFS= read -pr line; do
+                        llen=${%line}
+                        (( llen == -1 )) && llen=${#line}
+                        (( llen = llen ? (llen + COLUMNS - 1) / COLUMNS : 1 ))
+                        if (( (curlin += llen) >= LINES )); then
+                                print -n -- '\033[7m--more--\033[0m'
+                                read -u1 || exit $?
+                                [[ $REPLY = [Qq]* ]] && exit 0
+                                curlin=$llen
+                        fi
+                        print -r -- "$line"
+                done
+        )
+}
+
+# Create a new directory and enter it
+md() {
+        mkdir -p "$@" && cd "$@"
+}
+
+ram() {
+  local sum
+  local items
+  local app="$1"
+  if [ -z "$app" ]; then
+    echo "First argument - pattern to grep from processes"
+  else
+    sum=0
+    for i in `ps aux | grep -i "$app" | grep -v "grep" | awk '{print $6}'`; do
+      sum=$(($i + $sum))
+    done
+    sum=$(echo "scale=2; $sum / 1024.0" | bc)
+    if [[ $sum != "0" ]]; then
+      echo "${fg[blue]}${app}${reset_color} uses ${fg[green]}${sum}${reset_color} MBs of RAM."
+    else
+      echo "There are no processes with pattern '${fg[blue]}${app}${reset_color}' are running."
+    fi
+  fi
+}

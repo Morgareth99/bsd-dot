@@ -1,0 +1,15 @@
+colorscheme ocean
+colorscheme dracula
+shell cmus_format " %d %6{bitrate} kbps "
+colorscheme tomorrow
+colorscheme gruvbox
+colorscheme night
+colorscheme cyan
+colorscheme green-mono-88
+colorscheme gray-88
+colorscheme jellybeans
+colorscheme gruvbox-alt
+colorscheme base16
+colorscheme piers
+colorscheme zenburn
+colorscheme zenburn 

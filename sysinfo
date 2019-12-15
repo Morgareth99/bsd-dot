@@ -1,0 +1,54 @@
+#!/usr/local/bin/bash
+# nrnl.sh - displays sys info
+
+# colors
+f=3 b=4
+for j in f b; do
+    for i in {0..7}; do
+        printf -v $j$i "%b" "\e[${!j}${i}m"
+    done
+done
+bld=$'\e[1m'
+rst=$'\e[0m'
+inv=$'\e[7m'
+
+# detect
+user=$(whoami)
+host=$(sysctl -n kern.hostname)
+kernel=$(uname -a | awk '{print $6}')
+shell=$(basename $SHELL)
+pkgs=$(pkg info | awk 'END {print NR}')
+wm=$(wmctrl -m | awk 'NR==1 {print $2}' | perl -nle 'print ucfirst lc')
+os=$(sysctl -n kern.ostype)
+    
+
+init() {
+    init=$(readlink /sbin/init)
+    init=${init##*/}
+    init=${init%%-*}
+    export init
+}
+
+# exec
+init
+
+cat <<EOF
+
+       Os${f1}:${rst}     ${f1}$os${rst}
+       Kernel${f1}:${rst} ${f1}$kernel${rst}
+       Shell${f1}:${rst}  ${f1}$shell${rst}
+       Pkgs${f1}:${rst}   ${f1}$pkgs${rst}
+       Wm${f1}:${rst}     ${f1}$wm${rst}
+
+EOF
+
+#█▓▒░ colors
+printf "\n"
+i=0
+while [ $i -le 6 ]
+do
+  printf "\e[$((i+41))m\e[$((i+30))m█▓▒░"
+  i=$(($i+1))
+done
+printf "\e[37m█\e[0m▒░\n\n"
+

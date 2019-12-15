@@ -1,0 +1,14 @@
+[ -o login ] && . $HOME/.profile
+#. $HOME/fzf-mksh/completion.mksh
+#. $HOME/fzf-mksh/key-bindings.mksh
+. $HOME/.sh.d/functions
+
+
+HISTFILE=$HOME/.sh.d/.history
+HISTSIZE=4096
+CDPATH=.:$HOME:/
+
+PS1="$(printf  "\033[1;31m$USER \033[35m@ \033[31m♥ \033[34m~\n\\033[35m>\033[0m ")"
+
+# Shell options
+set -o bgnice

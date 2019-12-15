@@ -1,0 +1,7 @@
+set output_plugin=sndio
+set dsp.sndio.device=default
+set mixer.sndio.device=default
+set mixer.sndio.channel=Master
+
+bind common 0 shell ~/bin/cmus_edit_tags
+fset missing-tag=!stream&(artist=""|album=""|title=""|tracknumber=-1|date=-1)

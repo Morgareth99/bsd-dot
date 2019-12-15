@@ -1,0 +1,178 @@
+[colors]
+background-alt            = #ffffff
+background                = #212121
+background-urgent         = #FF0023
+foreground                = #E6ECE8 
+secondary                 = #EE0143
+foreground-empty          = #505050
+foreground-alt            = #30343F
+    
+
+[bar/morgareth]
+monitor = VGA-0
+height = 34
+width = 1358
+offset-x = 4
+offset-y = 6
+dpi-x = 96
+dpi-y = 96
+fixed-center = true
+background = ${colors.background}
+foreground = ${colors.foreground}
+;;padding-left = 0
+;;padding-right = 0
+module-margin-left = 0
+module-margin-right = 0
+margin-bottom = 0
+margin-top = 0
+
+font-0 =   PragmataPro for Powerline:style=Bold:pixelsize=8
+font-1 =   icomoon :pixelsize=9
+;;font-0 =  FontAwesome:style=Regular:pixelsize=8
+;;font-1 = "Font Awesome 5 Free:style=Regular:pixelsize=8"
+;;font-2 = "Font Awesome 5 Free:style=Solid:pixelsize=8"
+;;font-3 = "Font Awesome 5 Brands:pixelsize=8"
+
+
+;tray-position = right
+;tray-padding = 2
+;tray-background = ${colors.background}
+;wm-restack = bspwm
+modules-left = workspaces
+modules-center =   
+modules-right = mem cpu vol date power
+
+[module/bspwm]
+type                      = internal/bspwm
+format                    = <label-state> <label-mode>
+reverse-scroll            = false
+ws-icon-0                 = one;‚
+ws-icon-1                 = two;‚
+ws-icon-2                 = three;‚
+ws-icon-3                 = four;‚
+ws-icon-4                 = five;‚
+ws-icon-default           = â—
+label-focused             =%name%  
+;;label-focused-background  = #212121 
+label-focused-foreground  = #E3375D 
+label-focused-padding     = 3
+label-occupied            =%name%  
+label-occupied-padding    = 3
+label-urgent              = %name%  
+label-urgent-background   = ${colors.background-urgent}
+label-urgent-padding      = 3
+label-empty               = %name%  
+label-empty-foreground    = ${colors.foreground-empty}
+label-empty-padding       = 3
+label-monocle             = 
+label-monocle-padding     = 2
+label-monocle-background  = #212121
+label-monocle-foreground  = #E3375D
+label-floating            = 
+label-floating-padding    = 2
+label-floating-background = #212121
+label-floating-foreground = #E3375D
+label-font = 2
+
+
+[module/workspaces]
+type = internal/xworkspaces
+pin-workspaces = false
+enable-click = true
+enable-scroll = true
+format-padding = 2
+
+
+
+format = <label-state>
+label-active = %name%
+label-occupied = %name%
+label-urgent =  %name%
+label-empty = %name%
+
+label-empty-padding = 2
+label-active-padding = 2
+label-urgent-padding = 2
+label-occupied-padding = 2
+
+label-empty-foreground =  #FFFFFF
+label-active-foreground =  #E3375D
+label-urgent-foreground = #D14B81
+label-occupied-foreground = #21D835
+
+[module/mpd]
+
+type = internal/mpd
+;format-online = <icon-prev>  <label-time>  <label-song>  <icon-next>
+format-online = <toggle>  <label-song>
+;format-online = <label-time>  <label-song>
+;icon-prev = 
+;icon-next = 
+icon-play = 
+icon-pause = 
+;icon-prev-foreground = ${colors.accent}
+;icon-next-foreground = ${colors.accent}
+icon-pause-foreground = ${colors.accent}
+label-song-maxlen = 45
+label-song-ellipsis = true
+
+[module/date]
+type                      = custom/script
+interval                  = 1
+exec                      =  printf "%s " TODAY $(date +%H:%M) 
+format                    = <label>
+;;label = %{F#05fc15}TODAY%{F-} 
+;;format-prefix              = "  "
+;;format-prefix-foreground = #E3375D
+;;format-padding = 1
+;;label-font = 1
+label-background =  #E3375D
+
+[module/vol]
+type                       = custom/script
+interval                   = 1
+;;exec                     =  printf "%s " VOL: $(mixer -s vol | awk -F ':' '{print $2 "%"}') 
+exec                       =  mixer -s vol | awk -F ':' '{print $2 "%"}'
+format                     = <label>
+format-prefix              = " " 
+format-prefix-foreground   =  #E3375D
+format-padding = 1
+;;label-font = 1
+
+[module/power]
+type = custom/text
+content = "  "
+content-padding = 1
+content-foreground = #E3375D
+;;content-background = #934F7E
+click-left = dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop &
+click-right = dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart &
+
+
+[module/cpu]
+type                       = custom/script
+interval                   = 1
+exec                       =  bash /home/morgareth/cpu.sh 
+format                     = <label>
+;format-prefix              = "  " 
+format-prefix               = "  "
+format-prefix-foreground  =  #E3375D
+"format-padding = 1
+;;label-font = 1
+
+
+[module/mem]
+type                       = custom/script
+interval                   = 1
+exec                       =  bash /home/morgareth/mem.sh 
+format                     = <label>
+;;format-prefix             = "   " 
+format-prefix              =  "  "
+format-prefix-foreground   =  #E3375D
+;;format-padding = 1
+;;label-font = 1
+
+
+[module/separator]
+type = custom/text
+content = //
